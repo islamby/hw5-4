@@ -1,23 +1,48 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  const [count, setCount] = useState(0);
+  const [startTime, setStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  useEffect(() => {
+    let interval;
+    if (startTime) {
+      interval = setInterval(() => {
+        setElapsedTime(Date.now() - startTime);
+      }, 10);
+    }
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  const handleClick = () => {
+    if (!startTime) {
+      setStartTime(Date.now());
+    }
+    setCount(count + 1);
+  };
+
+  const handleReset = () => {
+    setCount(0);
+    setStartTime(null);
+    setElapsedTime(0);
+  };
+
+  const formatTime = (ms) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    const milliseconds = ms % 1000;
+    return `${minutes}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(3, '0')}`;
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Кликер</h1>
+      <p>Клики: {count}</p>
+      <p>Время: {formatTime(elapsedTime)}</p>
+      <button onClick={handleClick}>Кликни!</button>
+      <button onClick={handleReset}>Вернуть</button>
     </div>
   );
 }
